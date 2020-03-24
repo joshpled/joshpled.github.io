@@ -1,11 +1,11 @@
 # Site settings
-author: Joshua Perez Leduc
-title: 
+author: Joshua Perez-Leduc
+title: Just Joshin
 header-img: img/home-bg.png
 email: joshuapleduc@gmail.com
-copyright_name: Joshua Perez Leduc
+copyright_name: Joshua Perez-Leduc
 description: > # this means to ignore newlines until "baseurl:"
-  
+  The Journey
 baseurl: "" # the subpath of your site, e.g. /blog
 twitter_username: 
 github_username:  joshpled
