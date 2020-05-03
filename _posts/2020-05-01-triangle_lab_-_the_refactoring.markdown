@@ -119,6 +119,7 @@ Well I can write an if statement to determine if the sides in the array are cert
 Here's the kicker, in order for this to work, we have to change a few things. 
 
 That's when I discovered `*`  or the Splat operator!
+
 [FreeCodeCamp: An introduction to Ruby’s Splat and double Splat operators](https://www.freecodecamp.org/news/rubys-splat-and-double-splat-operators-ceb753329a78/)
 
 > The splat operator has almost endless uses!
