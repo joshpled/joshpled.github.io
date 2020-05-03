@@ -49,7 +49,7 @@ However, that would make things worse.
 
 So the googling begins.
 
-#### How can I refactor this and account for the illegal and legal triangles without losing my mind?
+**How can I refactor this and account for the illegal and legal triangles without losing my mind?**
 
 The journey wasn't simple, but it made me reconsider what I knew about implementing certain concepts I already knew. 
 
@@ -85,7 +85,7 @@ def kind
 end
 ```
 
-#### SO MUCH BETTER.
+**SO MUCH BETTER.**
 
 I didn't want to give up, I knew there had to be a better way. 
 
