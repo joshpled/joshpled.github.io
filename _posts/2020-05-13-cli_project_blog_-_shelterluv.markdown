@@ -1,7 +1,7 @@
 ---
 layout: post
 title:      "CLI Project Blog - Shelterluv"
-date:       2020-05-14 02:05:23 +0000
+date:       2020-05-13 22:05:24 -0400
 permalink:  cli_project_blog_-_shelterluv
 ---
 
@@ -166,3 +166,111 @@ it also allowed easier access to the information since the API looked like so:
         },
 				...
 ```
+
+When the API is called it also creates all the dog objects. Within the Dog class and Person class there is an @@all array class variable to store all the dogs and people.
+
+After all the Dog and Person objects were created it was time to make the CLI!
+
+## CLI:
+
+The CLI file looks a bit confusing at first, but I also added notes per section to help easily identify the code. 
+
+I decided on a while loop to identify whether or not the input was ever changed to exit. 
+
+```
+ while input != "exit"
+```
+
+```
+Choose from the following options:
+
+1. List of Dogs
+2. Search Dogs
+3. Fosters
+
+Option: 
+```
+
+First code I wanted to work on was the list of dogs. 
+
+The code is quite simple. It takes the array of dog objects, iterates through them, and `puts` each dog! 
+
+```
+def print_dogs_by_name(list)
+puts "\nThese are the dogs currently in the PIBA Foundation Database:"
+        puts 
+        list.each.with_index(1) do |dog, index|
+        puts "#{index}. #{dog.name}"
+        end 
+        puts "\nWhich dog would you like more information on?"
+        print "\nOption: " 
+end 
+```
+
+`.each.with_index(1)` -- will iterate through the array at index 0 but starts the list at 1. 
+
+When a dog is chosen the details will be displayed accordingly. 
+
+However, I wanted to ensure accuracy when selecting a dog, I decided to sort the `@@all` array within the dog class by` internal_id` (same with the person class). Since internal_id attribute was unique to every dog and person, it would keep the list organized for recalling. 
+
+```
+def self.all
+        @@all.sort_by{ |word| word.internal_id }
+    end
+```
+
+Choosing a dog is processed with this helper method:
+
+```
+def chosen_dog(input)
+        dog_id = Dog.all[input.to_i-1].internal_id
+        dog_details(dog_id)
+    end 
+```
+
+```
+def dog_details(dog_id)
+        dog = Dog.all.detect {|dog| dog.internal_id == dog_id.to_s}
+        
+        puts "\nSay Hello To: #{dog.name.colorize(:light_yellow)}!"
+        if dog.age == 12
+            puts "\nAge: #{dog.ag / 12} year old"
+        elsif dog.age < 12
+            puts "\nAge: #{dog.age % 12} months old"
+        elsif dog.age > 12 && dog.age < 14
+            puts "\nAge: #{dog.age / 12} year & #{dog.age % 12} months old"
+        else 
+            puts "\nAge: #{dog.age / 12} years & #{dog.age % 12} months old"
+        end 
+        puts "Size: #{dog.size}"
+        puts "Breed: #{dog.breed}"
+        puts "Color: #{dog.color}"
+        puts "Status: #{dog.status.include?("Available") ? "Available for Adoption" : "Not Available, Currently with Foster"}"
+        puts "With A Foster? #{dog.in_foster ? "Yes" : "No"}"
+        if dog.in_foster && dog.person
+            puts "Foster: #{dog.person["FirstName"]} #{dog.person["LastName"]}"
+        else
+            puts "No information for Foster"
+        end 
+        if dog.adoption_fee
+            puts "Adoption Fee: $#{dog.adoption_fee["Price"]}"
+        else
+            puts "Adoption Fee: N/A"
+        end 
+        puts "Photos: #{dog.photos.join}"
+        puts 
+
+    end 
+```
+
+I wanted the details to account for many possibilities: age variations, foster name, and adoption fee. I was also getting `undefined method for nil:NilClass` error triggered by a detail returned `nil`. 
+
+During the refactor process I hope to join both methods together. 
+
+```
+puts "\nTYPE: \n'list' for list of dogs, \n'fosters' for list of fosters, \n'search' for search menu, \n'home' for main menu,  \nor 'exit' to close program"
+            print "\nMenu Options: "
+            input = gets.strip.downcase
+```
+
+
