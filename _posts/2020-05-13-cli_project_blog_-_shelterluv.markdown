@@ -1,276 +1,153 @@
 ---
 layout: post
-title:      "CLI Project Blog - Shelterluv"
+title:      "CLI PROJECT - SHELTERLUV"
 date:       2020-05-13 22:05:24 -0400
 permalink:  cli_project_blog_-_shelterluv
 ---
 
-## Background: 
 
-PIBA Foundation is a non-profit organization dedicated to homeless animals and rehoming animals. It's a young company with many needs and as a cause I believe in I decided to dedicated my project to them. 
+## PIBA FOUNDATION USES SHELTERLUV TO CONNECT DOGS TO THEIR FUREVER HOME... I WANT TO HELP 
 
-Shelterluv.com is "The easy-to-use, modern shelter software you've been looking for." It has loads of features but best of all a fully functional API to use. 
+### PIBA FOUNDATION & SHELTERLUV.COM:
 
-My CLI project will utilize Shelterluv API with PIBA Database.
+The concept for the program was inspired by the PIBA Foundation. They are a non-profit organization based in St. Petersburg, Florida dedicated to rescuing dogs, pairing with fosters, and finding their furever home. 
 
-## Concept and Planning:
+Shelterluv.com offers a user friendly software to manage a rescue whether brick & mortar or foster based. It also includes a wonderful API to grab any information from the database of the rescue. That information can be used to make the lives of rescues much easier and more efficient. 
 
-Once I realized what I wanted to do, the planning stages included understanding how the API handled the information. There were four endpoints to consider - I decided to use two. 
+### THE APPLICATION
 
-```
-url = URI("https://www.shelterluv.com/api/v1/animals")
-## and
-url = URI("https://www.shelterluv.com/api/v1/people")
-```
+Being that this is the CLI project, I was immediately attracted to the possibility of helping the PIBA Foundation on their website. However, being an amateur programmer I wasn't exactly sure how this would help until I started the program. 
 
-One would be used to GET all animals and their information. The other would be to GET all people that have been entered in the database. The PIBA Foundation used this feature for foster volunteers. Thus that's what this endpoint would be used for. 
-
-Here's the plan: 
-1. Get all animal details and create an array with many objects. 
-2. Get all the people and create and array with many objects. 
-3. Doing this in two easy steps will ensure all the information is used before being called within the CLI. 
-4. I would need several classes: API, Person, Dog, and CLI.
-5. I want to include a Search class for search based on sex, size, and availability.
-6. Lastly, the CLI class should allow easy navigation through options without overcomplicating information shown. 
-
-Before execution, the final piece was an API key. Once I was given access, the process began.
-
-## Initial Stages: 
-
-The API was easy enough (the following code is before refactoring):
-
-```
-
-class Api
-
-        def self.get_by_name
-				
-            url = URI("https://www.shelterluv.com/api/v1/animals")
-        
-            https = Net::HTTP.new(url.host, url.port);
-            https.use_ssl = true
-        
-            request = Net::HTTP::Get.new(url)
-            request["x-api-key"] = ENV["KEY"]
-        
-            response = https.request(request)
-            animals = JSON.parse(response.body)
-            dogs = animals['animals']
-     
-            dogs.collect do |animal|
-                name = animal["Name"]
-                internal_id = animal["Internal-ID"]
-                sex = animal["Sex"]
-                status = animal["Status"]
-                in_foster = animal["InFoster"].to_s
-                size = animal["Size"]
-                photos = animal["Photos"]
-                breed = animal["Breed"]
-                color = animal["Color"]
-                age = animal["Age"]
-                adoption_fee = animal["AdoptionFeeGroup"]
-                person = animal["AssociatedPerson"]
-                Dog.new(name: name, internal_id: internal_id, sex: sex, status: status, in_foster: in_foster, size: size, photos: photos, breed: breed, color: color, age: age, adoption_fee: adoption_fee, person: person)
-            end
-            
-        
-        end 
-
-        def self.get_people
-            url = URI("https://www.shelterluv.com/api/v1/people")
-        
-            https = Net::HTTP.new(url.host, url.port);
-            https.use_ssl = true
-        
-            request = Net::HTTP::Get.new(url)
-            request["x-api-key"] = ENV["KEY"]
-        
-            response = https.request(request)
-            people_array = JSON.parse(response.body)
-            people = people_array["people"]
-            people.collect do |person|
-                first_name = person["Firstname"]
-                last_name = person["Lastname"]
-                email = person["Email"]
-                internal_id = person["Internal-ID"]
-                Person.new(first_name: first_name, last_name: last_name, email: email, internal_id: internal_id)
-            end
-        end 
-
-end
-    
-```
-
-My biggest challenge in the API class 
-
-```
-adoption_fee = animal["AdoptionFeeGroup"]
-person = animal["AssociatedPerson"]
-```
-
-For some unknown reason to a beginner programmer like myself, if I didn't include `dogs = animals['animals']` the entire code would break because the `["AdoptionFeeGroup"]` and `["AssociatedPerson"]` would not show up when called. 
-it also allowed easier access to the information since the API looked like so:
-
-```
-{
-    "success": 1,
-    "animals": [
-        {
-            "ID": "1",
-            "Internal-ID": "21970677",
-            "Name": "Sheldon",
-            "LitterGroupId": null,
-            "Type": "Dog",
-            "CurrentLocation": null,
-            "Sex": "Male",
-            "Status": "Available Foster",
-            "InFoster": true,
-            "AssociatedPerson": {
-                "FirstName": "Marissa",
-                "LastName": "Nelson",
-                "OutDateUnixTime": "1587309169",
-                "RelationshipType": "foster"
-            },
-            "CurrentWeightPounds": "",
-            "Size": "Medium (20-59)",
-            "Altered": "Yes",
-            "DOBUnixTime": 1418948388,
-            "Age": 64,
-            "CoverPhoto": "https://www.shelterluv.com/sites/default/files/animal_pics/24820/2020/04/24/08/20200424083059.png",
-            "Photos": [
-                "https://www.shelterluv.com/sites/default/files/animal_pics/24820/2020/04/24/08/20200424083059.png"
-            ],
-            "Videos": [],
-            "Breed": "Terrier, American Pit Bull/Mixed Breed (Large)",
-            "Color": "Tan/None",
-            "Pattern": "None",
-            "AdoptionFeeGroup": {
-                "Id": "231799",
-                "Name": "Adult Dog",
-                "Price": "200",
-                "Discount": 0,
-                "Tax": 0
-            },
-            "Description": "",
-            "PreviousIds": [],
-            "Microchips": [
-                {
-                    "Id": "981020031518027",
-                    "Issuer": "Petlink / Datamars",
-                    "ImplantUnixTime": ""
-                }
-            ],
-            "LastIntakeUnixTime": "1579047588",
-            "Attributes": [],
-            "LastUpdatedUnixTime": "1588529866"
-        },
-				...
-```
-
-When the API is called it also creates all the dog objects. Within the Dog class and Person class there is an @@all array class variable to store all the dogs and people.
-
-After all the Dog and Person objects were created it was time to make the CLI!
-
-## CLI:
-
-The CLI file looks a bit confusing at first, but I also added notes per section to help easily identify the code. 
-
-I decided on a while loop to identify whether or not the input was ever changed to exit. 
-
-```
- while input != "exit"
-```
-
-```
-Choose from the following options:
+The essence of the program is to utilize the API of Shelterluv to grab the information from the PIBA Database and display in the terminal.
+This is all done with three different options:
 
 1. List of Dogs
-2. Search Dogs
-3. Fosters
+2. Search for Dogs
+3. List of Fosters
 
-Option: 
-```
+When I knew what I wanted to do with the API I had to find the endpoints. Thankfully the API offered two great endpoints for people and animals.
 
-First code I wanted to work on was the list of dogs. 
+The list of dogs allows you to choose a dog and get all the major details. The search feature can let you search by sex, size, and availability. The list of fosters lets the user see all the fosters and get contact information. 
 
-The code is quite simple. It takes the array of dog objects, iterates through them, and `puts` each dog! 
+To start, I used the `bundle gem` because it created the basic file structure for the project. What's that old saying again? Work smarter, not harder? 
 
-```
-def print_dogs_by_name(list)
-puts "\nThese are the dogs currently in the PIBA Foundation Database:"
-        puts 
-        list.each.with_index(1) do |dog, index|
-        puts "#{index}. #{dog.name}"
-        end 
-        puts "\nWhich dog would you like more information on?"
-        print "\nOption: " 
-end 
-```
+### BIGGEST CHALLENGES
 
-`.each.with_index(1)` -- will iterate through the array at index 0 but starts the list at 1. 
+First big challenge was the API KEY. I guess in hindsight I could have chosen an API that didn't require a key, but what's the fun in that?
 
-When a dog is chosen the details will be displayed accordingly. 
+I learned of the `dotenv` gem. A file named just ".env" with the API KEY set inside the file. Then utilizing the `request["x-api-key"] = ENV["KEY"]` where the key is required. Gem requirement: `require 'dotenv'` and `Dotenv.load`. Final step: create a `.gitignore` file and add the line `.env`. I did run into some issues after I realized that the .env file was still being pushed into the repo. I googled my way through a few commands such as `git rm -f .env` to remove the file. I still had questions about adding the file back, but I left it as is because it didn't show up on the repo! I call that a success. 
 
-However, I wanted to ensure accuracy when selecting a dog, I decided to sort the `@@all` array within the dog class by` internal_id` (same with the person class). Since internal_id attribute was unique to every dog and person, it would keep the list organized for recalling. 
+Another big challenge was the CLI loop for user input. Especially because user input would be required after any helper method and the input variable was constantly changing. I'll display the while loop below:
 
 ```
-def self.all
-        @@all.sort_by{ |word| word.internal_id }
-    end
-```
-
-Choosing a dog is processed with this helper method:
-
-```
-def chosen_dog(input)
-        dog_id = Dog.all[input.to_i-1].internal_id
-        dog_details(dog_id)
-    end 
-```
-
-```
-def dog_details(dog_id)
-        dog = Dog.all.detect {|dog| dog.internal_id == dog_id.to_s}
-        
-        puts "\nSay Hello To: #{dog.name.colorize(:light_yellow)}!"
-        if dog.age == 12
-            puts "\nAge: #{dog.ag / 12} year old"
-        elsif dog.age < 12
-            puts "\nAge: #{dog.age % 12} months old"
-        elsif dog.age > 12 && dog.age < 14
-            puts "\nAge: #{dog.age / 12} year & #{dog.age % 12} months old"
-        else 
-            puts "\nAge: #{dog.age / 12} years & #{dog.age % 12} months old"
-        end 
-        puts "Size: #{dog.size}"
-        puts "Breed: #{dog.breed}"
-        puts "Color: #{dog.color}"
-        puts "Status: #{dog.status.include?("Available") ? "Available for Adoption" : "Not Available, Currently with Foster"}"
-        puts "With A Foster? #{dog.in_foster ? "Yes" : "No"}"
-        if dog.in_foster && dog.person
-            puts "Foster: #{dog.person["FirstName"]} #{dog.person["LastName"]}"
-        else
-            puts "No information for Foster"
-        end 
-        if dog.adoption_fee
-            puts "Adoption Fee: $#{dog.adoption_fee["Price"]}"
-        else
-            puts "Adoption Fee: N/A"
-        end 
-        puts "Photos: #{dog.photos.join}"
-        puts 
-
-    end 
-```
-
-I wanted the details to account for many possibilities: age variations, foster name, and adoption fee. I was also getting `undefined method for nil:NilClass` error triggered by a detail returned `nil`. 
-
-During the refactor process I hope to join both methods together. 
-
-```
-puts "\nTYPE: \n'list' for list of dogs, \n'fosters' for list of fosters, \n'search' for search menu, \n'home' for main menu,  \nor 'exit' to close program"
+## Loop for input.
+    while input != "exit"
+		if input.to_i == 1 or input == 'list'
+		    ## Display list of all current dogs in the PIBA Database.
+		    puts "\n" + b.asciify('LIST').colorize(:yellow)
+		    print_dogs_by_name(Dog.all)
+		    input = gets.strip.downcase.to_i
+		    if input > 0
+		    chosen_dog(input)
+		    end 
+		elsif input.to_i == 2 or input == 'search'
+		    ## Search for a dog based on a criteria
+		    puts "\n" + b.asciify('SEARCH').colorize(:yellow)
+		    puts "\nYou can search based on the following criteria:"
+		    puts "\n1. Size"
+		    puts "2. Sex"
+		    puts "3. Availability"
+		    print "\nOption: " 
+		    input = gets.strip.downcase
+		    case input.to_i
+		    when 1
+		        ## Uses a helper method below to display results.
+		        dogs_by_size
+		        print "\nOption: "
+		        input = gets.strip.downcase.to_i
+		        dog_id = Search.results[input.to_i-1].internal_id
+		        dog_details(dog_id)
+		    when 2
+		        ## Uses a helper method below to display results.
+		        dogs_by_sex
+		        print "\nOption: "
+		        input = gets.strip.downcase.to_i
+		        dog_id = Search.sex_results[input.to_i-1].internal_id
+		        dog_details(dog_id)
+		    when 3
+		        ## No helper method needed. 
+		        Search.search_by_availability
+		    else
+		     prompt_user
+		    end 
+		elsif input.to_i == 3 or input == 'fosters'
+		    ## List of all fosters in the system. 
+		    puts "\n" + b.asciify('FOSTERS').colorize(:yellow)
+		    Person.all.each.with_index(1) do |person, index|
+		        puts "#{index}. #{person.first_name} #{person.last_name}"
+		        end 
+		    puts "\n\nSome fosters are also staff."
+		    print "\nOption: " 
+		    input = gets.strip.downcase.to_i
+		    input > 0 ? chosen_foster(input) : "Invalid Input"
+		elsif input == "home"
+		    prompt_user
+		else
+		    puts "\nInvalid input"
+		    puts "\nIf choosing from a numbered list, your input must be a number."
+		    puts 
+		end
+  puts "\nTYPE: \n'list' for list of dogs, \n'fosters' for list of fosters, \n'search' for search menu, \n'home' for main menu,  \nor 'exit' to close program"
             print "\nMenu Options: "
             input = gets.strip.downcase
+        end 
+        ## IF 'exit' is entered, the following will show and close the app. 
+        puts "\n" + b.asciify('PIBA Foundation').colorize(:yellow)
+        puts "\nThe PIBA Foundation is committed to assisting and advocating for the well-being of individuals and animals through disaster relief, community engagement, and environmental quality."
+        puts "\nThe PIBA Foundation is a 501(c)(3) organization. Contributions to The PIBA Foundation are tax-deductible to the extent allowed by law. The tax identification number is 84-2979389."
+        puts "\nThank You for checking in!"
+        puts
+    end 
 ```
+Since I'm currently writing this before the refacoring process, note that the loop is simple in it's design. A while loop that waits for `exit` command. The complexity came when the input was requested at the wrong time. Since input was constantly being called for every menu, it was easier to change every line that `print "\nOption: "` to something unique. Then running the possible scenarios and taking note of all the breaks. It was a feat worth the time put into it as I learned TONS about input and how to handle integers and string inputs. I also learned that menu choosing could be refactored to something much more elegant but I wanted to showcase my current knowledge before spending any more time on the loop.
+
+One of the absolute greatest discoveries was the challenge of understanding the error: `undefined method for nil:NilClass`
+It has so many possibilities but ever since running into it more times than I care to relive, I learned many ways to debug it. 
+The easiest was "undefined method" of course if the method isn't created... easy enough.
+ 
+`undefined method '[]' for nil:NilClass (NoMethodError)`
+This particular one had me stumped for a while. I had to track it down in pry from the CLI class all the way back to the root. It took a long time, but I finally found the culprit. It wasn't necessarily a method, but rather that while creating the objects (dog or person) if one the values it was looking for was nil, this error would show up! So I had to create if statements to account for the nil. 
+
+This may seem like a simple error and trivial to figure out, but errors are the bane of any programmers existence. Things don't always workout exactly as expected and each error is a new Google journey into the abyss. Understanding even one of those errors will hopefully help me in the future. 
 
 
+### Wonderful Discoveries 
+
+I discovered so many great gems for Ruby through this journey.
+Possibly my favorite is Artii. For this CLI project it really added a much needed flair to titles.
+Best part about this gem is the simplicity of setup:
+
+```
+a = Artii::Base.new
+b = Artii::Base.new :font => 'straight'
+```
+ 
+ Then I combined the Colorize gem to add color to the titles:
+ 
+ ```
+  puts "\n" + a.asciify('PIBA').colorize(:light_yellow)
+  puts "\n" + "#{b.asciify('powered by')} Shelter Luv".colorize(:yellow)
+ ```
+ 
+I also realized that I understand WAY more than I initially thought. I learned the difference between many different iterators. Truly grasped the concept of scope and self. I learned how important refactoring is and how much I prefer it. Even for myself, messy code stresses me out. 
+
+### FINAL THOUGHTS
+
+The best part of being left to create the application on (mostly) your own is the amount of times I googled and learned something new. No matter how badly I didn't understand something, I needed this application to work! 
+
+One of my favorite quotes is by Albert Einstein:
+
+> It's not that I'm so smart, it's just that I stay with problems longer.
+
+With this project, I can honestly say the greatest lesson learned was to keep at it! 
+If something doesn't make sense just keep looking, keep trying, keep reading, and eventually it will click like a light bulb and you will have accomplished something wonderful! 
