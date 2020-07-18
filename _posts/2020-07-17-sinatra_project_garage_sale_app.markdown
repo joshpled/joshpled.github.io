@@ -1,7 +1,7 @@
 ---
 layout: post
 title:      "Sinatra Project: Garage Sale App"
-date:       2020-07-18 02:41:08 +0000
+date:       2020-07-17 22:41:09 -0400
 permalink:  sinatra_project_garage_sale_app
 ---
 
@@ -14,18 +14,14 @@ The simplicity of the app is based on a craigslist but with better inventory con
 
 ### How It Works
 
-The User will:
+The User can:
 
-1. Sign up
-2. Create a list
-3. Add items
-4. Click Sold button to mark sold
-5. Restore sold item
-6. Delete Items
-7. Edit items
-8. Delete Listings
-9. Edit Listings
-10. Delete their account
+* Create Listings
+* Add Items
+* Mark item as Sold
+* Restore Items Not Sold
+* Contact Sellers
+
 
 See images:
 [https://imgur.com/a/7oSedag]
@@ -35,6 +31,12 @@ See images:
 The basics of the application were easy: routes, MVC, etc. The hard part was error messages, validation, CSS, Front-End, and protecting routes.
 
 I would like to warn future sinatra programmers to never use Rack:Flash. It was a nightmare that was more easily fixed by using Sinatra::Flash. Which may sound like a no brainer but sometimes we take the hard route to learn our lessons harder. 
+
+Rack::Flash worked, or so I thought, for a little while in the beginning stages of development. 
+The implementation is very similar to Sinatra::Flash. 
+However, I believe what broke my code was implementing Bootstrap. I can't be 100% sure, but the battle to make it work led me to give up.
+
+Sinatra::Flash is a better implementation and much easier to use and display.
 
 Sinatra::Flash offers a very simple way of showing flash messages. The hard part was trying to create messages for the many different errors without a long if loop or case when loop. 
 
